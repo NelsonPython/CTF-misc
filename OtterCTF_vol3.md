@@ -708,7 +708,7 @@ Processing: 3720.vmware-tray.ex.0xec0000.dmp
 
 I opened the .png file in /output/png to view the flag
 
-[Flag image](S0_Just_M0v3_Socy.png)
+![Flag image](00000687.png)
 
 ### CTF{S0_Just_M0v3_Socy}
 
