@@ -1,6 +1,6 @@
 ## OtterCTF memory forensics with Volatility 3 
 
-The OtterCTF 2018 - Memory Forensics challenge includes reverse engineering, steganography, network traffic, and other forensics challenges.  In order to improve my forensics skills, I worked through the writeup posted by Peter M. Stewart and updated Volatility 2 commands to the Volatility 3 Framework 2.7.1.  See the original writeup at: [https://www.petermstewart.net/otterctf-2018-memory-forensics-write-up/](https://www.petermstewart.net/otterctf-2018-memory-forensics-write-up/).  
+The OtterCTF 2018 - Memory Forensics challenge includes reverse engineering, steganography, network traffic, and other forensics challenges.  In order to improve my forensics skills, I worked through the writeup posted by Peter M. Stewart and updated the original Volatility 2 commands to the newer Volatility 3 Framework 2.7.1.  See the original writeup at: [https://www.petermstewart.net/otterctf-2018-memory-forensics-write-up/](https://www.petermstewart.net/otterctf-2018-memory-forensics-write-up/).  
 
 Flag format:  CTF{...}
 
