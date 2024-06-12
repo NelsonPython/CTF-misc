@@ -1,21 +1,23 @@
-OtterCTF 2018 - Memory Forensics includes reverse engineering, steganography, network traffic, and other forensics challenges.
-In order to improve my forensics skills, I worked through the writeup posted by
-Peter M. Stewart and updated the commands to work with Volatility 3 Framework 2.7.1.
-See the original writeup at: https://www.petermstewart.net/otterctf-2018-memory-forensics-write-up/
+## OtterCTF memory forensics with Volatility 3 
 
-I downloaded OtterCTF.vmem and checked the MD5 and SHA1 hashes:
+The OtterCTF 2018 - Memory Forensics challenge includes reverse engineering, steganography, network traffic, and other forensics challenges.  In order to improve my forensics skills, I worked through the writeup posted by Peter M. Stewart and updated Volatility 2 commands to the Volatility 3 Framework 2.7.1.  See the original writeup at: [https://www.petermstewart.net/otterctf-2018-memory-forensics-write-up/](https://www.petermstewart.net/otterctf-2018-memory-forensics-write-up/).  
 
+Flag format:  CTF{...}
+
+First, I downloaded OtterCTF.vmem and checked the MD5 and SHA1 hashes:
+
+```
 └─$ md5sum OtterCTF.vmem 
 ad51f4ada4151eab76f2dce8dea69868  OtterCTF.vmem
 
 sha1sum OtterCTF.vmem   
 e6929ec61eb22af198186238bc916497e7c2b1d2  OtterCTF.vmem
+```
 
 These matched the hashes in the original writeup.
 
 ## QUESTION 1 - What is the password?
-You got a sample of Rick's PC's memory, can you get his user password?
-Flag format:  CTF{...}
+From the memory dump of Rick's PC, can you find his user password?
 
 ```
 ─$ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem windows.info.Info
@@ -47,7 +49,7 @@ PE Machine      34404
 PE TimeDateStamp        Sat Nov 20 09:30:02 2010
 ```
 
-I found the password hashes using hashdump, a dump of the NTLM hashes from the SYSTEM and SAM registry hives.
+I found password hashes by using hashdump, a dump of the NTLM hashes from the SYSTEM and SAM registry hives.
 
 ```
 $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem hashdump
@@ -67,15 +69,12 @@ I tried extracting the plaintext password from LSA secrets using lsadump:
 Key             Secret                      Hex
 DefaultPassword (MortyIsReallyAnOtter       28 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 4d 00 6f 00 72 00 74 00 79 00 49 00 73 00 52 00 65 00 61 00 6c 00 6c 00 79 00 41 00 6e 00 4f 00 74 00 74 00 65 00 72 00 00 00 00 00 00 00 00 00
 ```              
-
 ### PASSWORD:  CTF{MortyIsReallyAnOtter}
 
-
 ## QUESTION 2: General Info
-What is the PC name and IP address?
+What is the name of the PC and the IP address?
 
-
-To find the computer name, search the hive for REGISTRY\MACHINE\SYSTEM
+To find the computer name, I searched the hive for REGISTRY\MACHINE\SYSTEM
 ```
 └─$ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem hivelist
 
@@ -97,7 +96,8 @@ Offset          FileFullPath                            File output
 0xf8a0020ad410  \??\C:\Users\Rick\AppData\Local\Microsoft\Windows\UsrClass.dat  Disabled
 0xf8a00377d2d0  \??\C:\System Volume Information\Syscache.hve   Disabled
 ```
-Print the information stored in the registry by using the offset, 0xf8a000024010, and the registry key, ControlSet001\Control\ComputerName\ComputerName
+
+I printed the information stored in the registry by using the offset, 0xf8a000024010, and the registry key, ControlSet001\Control\ComputerName\ComputerName
 
 ```
 $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem printkey --offset 0xf8a000024010 --key "ControlSet001\Control\ComputerName\ComputerName"
@@ -107,10 +107,10 @@ Last Write Time                 Hive Offset     Type    Key                     
 2018-06-02 19:23:00.000000      0xf8a000024010  REG_SZ  \REGISTRY\MACHINE\SYSTEM\ControlSet001\Control\ComputerName\ComputerName        (Default)       "mnmsrvc"       False
 2018-06-02 19:23:00.000000      0xf8a000024010  REG_SZ  \REGISTRY\MACHINE\SYSTEM\ControlSet001\Control\ComputerName\ComputerName        ComputerName    "WIN-LO6FAF3DTFE"       False
 ```
-###Computer Name: CTF{WIN-LO6FAF3DTFE}
+### Computer Name: CTF{WIN-LO6FAF3DTFE}
 
-
-To get the IP address, use netscan to get network data.  The local address (LocalAddr) contains 192.168.202.131 along with the loopback address of 127.0.0.1 and 0.0.0.0
+To get the IP address, I used netscan.  The local address (LocalAddr) contains 192.168.202.131 along with 127.0.0.1 and 0.0.0.0.  See
+[https://superuser.com/questions/949428/whats-the-difference-between-127-0-0-1-and-0-0-0-0](https://superuser.com/questions/949428/whats-the-difference-between-127-0-0-1-and-0-0-0-0)
 
 ```
 $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem netscan
@@ -268,8 +268,8 @@ Offset          Proto   LocalAddr       LocalPort       ForeignAddr     ForeignP
 ## QUESTION 3 - Play Time
 Rick loves to play old videogames.  Which game is he playing and what's the IP address of the server?
 
-pstree provides a list of running processes
-                 
+pstree provides a list of processes that were running
+
 ```
 ─$ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem windows.pstree.PsTree               
 PID     PPID    ImageFileName   Offset(V)       Threads Handles SessionId       Wow64   CreateTime      ExitTime        Audit   Cmd     Path
@@ -341,10 +341,10 @@ PID     PPID    ImageFileName   Offset(V)       Threads Handles SessionId       
 3304    3132    notepad.exe     0xfa801b1fd960  2       79      1      False    2018-08-04 19:34:10.000000      N/A     \Device\HarddiskVolume1\Windows\System32\notepad.exe    "C:\Windows\system32\NOTEPAD.EXE" C:\Users\Rick\Desktop\Flag.txt.WINDOWS        C:\Windows\system32\NOTEPAD.EXE
 ```
 LunarMS.exe is the name of an old videogame.
+### CTF{LunarMS}
 
-CTF{LunarMS}
+To find the IP address of the server, I used grep to search for LunarMS in the netscan:
 
-To find the IP address of the server, use grep to search for LunarMS in the netscan
 ```
 python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem netscan | grep "LunarMS"
 
@@ -352,20 +352,19 @@ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem netscan | grep "LunarMS"
 0x7e413a40      TCPv4   -       0       -       0       CLOSED  708    LunarMS.exe      -
 0x7e521b50      TCPv4   -       0       -       0       CLOSED  708    LunarMS.exe
 ```
-CTF{77.102.199.102}
-
+### CTF{77.102.199.102}
 
 ## QUESTION 4 - Name Game
 We know that the account was logged into a channel called Lunar-3.  What is the account name?
 
-The account name will be in the process memory.  Use windows.memmap with --dump and the process id --pid 708.
+The account name will be in the process memory.  I used windows.memmap with --dump and the process id --pid 708.
 
 ```
 python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem windows.memmap --dump --pid 708
 ```
 
-This will create a file named, pid.708.dmp.  Use the strings and grep commands to find 10 lines above and below "Lunar-3".
-This is an abridged list.  Given the references to otters in this challenge, 0tt3r8r33z3, seems likely to be the flag.
+This created a file named, pid.708.dmp.  I used the strings and grep commands to find 10 lines above and below "Lunar-3".
+Here's a partial list.  Given the references to otters in this challenge, 0tt3r8r33z3, seems likely to be the flag.
                  
 ```
 ─$ strings pid.708.dmp | grep -C 10 "Lunar-3"  
@@ -389,7 +388,7 @@ WorldSelect
 The username of the logged on character is always after this signature: 0x64 0x??{6-8} 0x40 0x06 0x??{18} 0x5a 0x0c 0x00{2}
 What is rick's character's name?
 
-Use ssd to display bytes and grep to search for the end of the target signature:
+I used ssd to display bytes and grep to search for the end of the target signature:
 
 ```
 ─$ xxd pid.708.dmp| grep "5a0c 0000"  
@@ -417,8 +416,7 @@ Use ssd to display bytes and grep to search for the end of the target signature:
 ...
 ```
 
-The line with address 0c33a4a0 contains some readable text, M0rt.
-Use xxd with -s start at this address: 0x0c33a4aC.  Stop after 16 octets as indicated by -l 16
+The line with address 0c33a4a0 contains some readable text, M0rt.  I used xxd with -s start at this address: 0x0c33a4aC and stopped after 16 octets as indicated by -l 16
 
 ```
 xxd -s 0x0c33a4aC -l 16 pid.708.dmp
@@ -432,18 +430,18 @@ his password.  He always copy-paste the password.  What is Rick's email password
 
 The clipboard plugin has not been ported to Volatility 3.
 
-TODO:  Find another solution 
+### TODO:  Find another solution 
 
 ## QUESTION 7 - Hide and Seek
 Rick's PC memory dump contains malware.  Find the name of the malware including the extension.
-The pstree command lists the processes.  There are quite a few, so I listed them to a text file
- that I can open in a text editor.
+
+The pstree command lists the processes.  There are quite a few, so I listed them to a text file that I can open in a text editor.
 
 ```
 $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem windows.pstree.PsTree > exp_pstree.txt
 ``` 
 
-Review of the processes indicates there are some interesting possibilities:
+I reviewed the processes and found some interesting possibilities:
 
 ```
 * 3820	2728	Rick And Morty	0xfa801b486b30	4	185	1	True	2018-08-04 19:32:55.000000 	N/A	\Device\HarddiskVolume1\Torrents\Rick And Morty season 1 download.exe	"C:\Torrents\Rick And Morty season 1 download.exe" 	C:\Torrents\Rick And Morty season 1 download.exe
@@ -452,7 +450,7 @@ Review of the processes indicates there are some interesting possibilities:
 3304	3132	notepad.exe	0xfa801b1fd960	2	79	1	False	2018-08-04 19:34:10.000000 	N/A	\Device\HarddiskVolume1\Windows\System32\notepad.exe	"C:\Windows\system32\NOTEPAD.EXE" C:\Users\Rick\Desktop\Flag.txt.WINDOWS	C:\Windows\system32\NOTEPAD.EXE
 ```
 
-The plugin cmdline will show the full command line associated with the process.
+The plugin cmdline shows the full command line associated with a process.
 
 ```
 $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem windows.cmdline.CmdLine --pid 3820
@@ -486,7 +484,7 @@ An application running from a users \AppData\Local\Temp\ folder is odd.  This is
 How did the malware get installed?  It must be because of one of Rick's bad habits.
 
 Previously, I found file pathes indicating the Bittorrent was involved.
-What is the torrent file associated with the vmware-tray.exe?  Search for "rick and morty"
+What is the torrent file associated with the vmware-tray.exe?  I searched for "rick and morty"
 
 ```
 $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem filescan | grep -i "rick and morty"
@@ -506,7 +504,7 @@ $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem filescan | grep -i "rick 
 0x7e7ae700      \Torrents\Rick and Morty Season 2 [WEBRIP] [1080p] [HEVC]\Sample\Screenshot 08.png     216
 ``` 
 
-Extract files from memory
+I extracted the files from memory
 
 ```
 $ python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem dumpfiles --physaddr 0x7d8813c0
@@ -539,15 +537,12 @@ $$o9p
 bwF:u
 e7:website19:M3an_T0rren7_4_R!cke
 ```
-
 ### CTF{M3an_T0rren7_4_R!cke}
 
-
-##QUESTION 9 - Path to Glory 2
+## QUESTION 9 - Path to Glory 2
 Continue the search to find the way the malware got in
 
-The ZoneID=3 extracted in the last question indicates that the torrent was downloaded from the internet.
-chrome.exe appears frequently in the pstree output.
+The ZoneID=3 extracted in the last question indicates that the torrent was downloaded from the internet.  chrome.exe appears frequently in the pstree output.
 
 ```
 * 4076	2728	chrome.exe	0xfa801a4e3870	44	1160	1	False	2018-08-04 19:29:30.000000 	N/A	\Device\HarddiskVolume1\Program Files (x86)\Google\Chrome\Application\chrome.exe	"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" 	C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
@@ -560,7 +555,7 @@ chrome.exe appears frequently in the pstree output.
 ** 2748	4076	chrome.exe	0xfa801a7f98f0	15	181	1	False	2018-08-04 19:31:15.000000 	N/A	\Device\HarddiskVolume1\Program Files (x86)\Google\Chrome\Application\chrome.exe	"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --type=renderer --field-trial-handle=984,15358569600588498425,3475374789430647391,131072 --service-pipe-token=5B96B12CED256E93CD66ABC8626426FB --lang=en-US --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --device-scale-factor=1 --num-raster-threads=1 --service-request-channel-token=5B96B12CED256E93CD66ABC8626426FB --renderer-client-id=22 --mojo-platform-channel-handle=2104 /prefetch:1	C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
 
 ```
-Google Chrome may be the primary browser.  Find the Chrome history database.                 
+Google Chrome may be the primary browser.  I found the Chrome history database and renamed it as a sqlite file, chrome-history.sqlite.  Then, I used sqlite3 to query it.
 
 ```
 python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem filescan | grep -i "history"
@@ -635,7 +630,6 @@ js-box-flex need-overlay js-componentone
 
 ### CTF{Hum@n_I5_Th3_Weak3s7_Link_In_Th3_Ch@in}
 
-
 ## QUESTION 10 - Bit 4 Bit
 The malware on this machine is ransomware.  Find the attacker's bitcoin address.
 
@@ -666,10 +660,7 @@ $ hexdump file.0x7e410890.0xfa801b0532e0.DataSectionObject.Flag.txt.dat
 ```
 I tried using CyberChef to decode flag.txt but no luck.
 
-The ransomware message says to read program for more information.
-I found the PID for the ransomware in Question 7 so I can dump the process memory
-then run strings with the -e l argument to search for Unicode strings that
-may contain the bitcoin address.
+The ransomware message says to read program for more information.  I found the PID for the ransomware in Question 7 so I can dump the process memory, then run strings with the -e l argument to search for Unicode strings that may contain the bitcoin address.
 
 ```
 python3 vol.py -f /home/kali/13_memory/OtterCTF.vmem windows.memmap --pid 3720 --dump
@@ -685,7 +676,6 @@ I paid, Now give me back my files.
 ```
 
 ### CTF{1MmpEmebJkqXG8nQv4cjJSmxZQFVmFo63M}
-
 
 ## QUESTION 11 - Graphics for the Weak
 
@@ -716,20 +706,22 @@ Processing: 3720.vmware-tray.ex.0xec0000.dmp
 |*|
 ```
 
-Open the .png file in /output/png to view the flag
+I opened the .png file in /output/png to view the flag
+
+[Flag image](S0_Just_M0v3_Socy.png)
 
 ### CTF{S0_Just_M0v3_Socy}
 
-
 ## QUESTION 12 - Recovery
-
 Rick's files were recovered.  What is the random password used to encrypt the files?
 
-Extract unicode encoding using the -e option to specify the encoding method, and l stands for little-endian UTF-16 encoding. This command will extract and display Unicode strings from the specified file.
+I extracted the unicode encoding using the -e option to specify the encoding method with l for little-endian UTF-16 encoding.
 
 ```
 ─$ strings -e l /home/kali/13_memory/OtterCTF.vmem > exp_unicode.txt
 ```
+
+Then, I followed the original instructions and experimented with various strings.  Grepping the computer name resulted in finding the password.
 
 ```
 ─$ grep "WIN-LO6FAF3DTFE" exp_unicode.txt | sort | uniq
@@ -742,22 +734,14 @@ WIN-LO6FAF3DTFERick
 WIN-LO6FAF3DTFE-Rick aDOBofVYUNVnmp7
 ...
 ```
-
 ### CTF{aDOBofVYUNVnmp7}
-
-
 
 ## QUESTION 13 - Closure
 Using this password, can you decrypt Rick's files?
 
-I extracted the malware executable in question 11 and stored it in a file called,
-3720.vmware-tray.ex.0xec0000.dmp
+I extracted the malware executable in question 11 and stored it in a file called, 3720.vmware-tray.ex.0xec0000.dmp
 
-Perhaps someone already uploaded this to an online sandbox such as VirusTotal.
-Compute the SHA1 hash to check.
-
-Unfortunately, the SHA1 that I computed did not match the SHA1 computed in the original writeup.
-This is likely because the original writeup used procdump from Volatility 2 and I used psscan from Volatility 3.
+I computed the SHA1 hash and checked whether it was posted on VirusTotal.  Unfortunately, the SHA1 that I computed did not match the SHA1 computed in the original writeup.  This is likely because the original writeup used procdump from Volatility 2 and I used psscan from Volatility 3.
 
 ```
 $ sha1sum 3720.vmware-tray.ex.0xec0000.dmp  
@@ -789,4 +773,6 @@ $ dd bs=1 count=48 if=file.0x7e410890.0xfa801b0532e0.DataSectionObject.Flag.txt.
 ```
 
 The original writeup explains how to decrypt this password using a Windows 7 VM.
+
+
 
