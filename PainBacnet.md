@@ -17,6 +17,8 @@ Reference:
 
 ### present-value
 
+![wireshark capture showing the present-value listed below](wireshark_bacapp-present-value.png)
+
 The present-value contains the real values of sensor readings.  Sensors should report readings within an acceptable range.  In the query below, instance number 7 has some sensor readings between 1400 - 1500, but a few readings are slightly above 99999.  The sensor name for the sensor reporting these high readings is most likely the flag.
 
 ```
@@ -58,6 +60,8 @@ tshark -T fields -e bacapp.present_value.real -r bacnet.pcap 'bacapp.objectType=
 In order to get the name of the sensor reporting the high values slightly above 99999, get the object_name.
 
 ### object_name
+
+![wireshark capture showing the object name below](wireshark-bacapp-object-name.png)
 
 ```
 tshark -T fields -e bacapp.instance_number -e frame.number -e bacapp.object_name -r bacnet.pcap 'bacapp.objectType==analog-input && bacapp.object_name && bacapp.instance_number==7'
