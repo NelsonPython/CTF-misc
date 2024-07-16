@@ -22,7 +22,7 @@ File:  bacnet.pcap
 
 ### Solution:
 
-This solution extends work by adding tshark scripts to automate researching the bacnet.pcap
+This solution extends work by [SinDaRemedy](https://github.com/infosecstreams/csaw21/tree/gh-pages/a-pain-in-the-bacnet) by adding tshark scripts to automate researching bacnet.pcap
 
 ### present-value
 
