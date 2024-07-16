@@ -1,7 +1,7 @@
 ## Pain in the BAC(net)
 
-BACnet Stands for Building Automation and Control Networks. BACnet was formed by ASHRAE in 1995 as Standard 135.
-[BACnet tutorial](https://blog.smartbuildingsacademy.com/whatisbacnet)
+BACnet Stands for Building Automation and Control Networks. BACnet was formed by ASHRAE in 1995 as Standard 135.  
+Learn more:  [BACnet tutorial](https://blog.smartbuildingsacademy.com/whatisbacnet)
 
 ### Challenge
 
