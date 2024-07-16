@@ -3,7 +3,7 @@
 BACnet Stands for Building Automation and Control Networks. BACnet was formed by ASHRAE in 1995 as Standard 135.  
 Learn more:  [BACnet tutorial](https://blog.smartbuildingsacademy.com/whatisbacnet)
 
-### Challenge
+### Challenge:
 
 Attached is a packet capture taken from a building management network. One of the analog sensors reported values way outside of its normal operating range. Can you determine the object name of this analog sensor? 
 
@@ -19,6 +19,10 @@ File:  bacnet.pcap
 [https://github.com/infosecstreams/csaw21/tree/gh-pages/a-pain-in-the-bacnet](https://github.com/infosecstreams/csaw21/tree/gh-pages/a-pain-in-the-bacnet) [PDF](APainInTheBACnet.pdf)
 
 [Display Filter Reference: Building Automation and Control Network APDU](https://www.wireshark.org/docs/dfref/b/bacapp.html)
+
+### Solution:
+
+This solution extends work by adding tshark scripts to automate researching the bacnet.pcap
 
 ### present-value
 
