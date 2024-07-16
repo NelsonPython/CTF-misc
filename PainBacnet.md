@@ -10,9 +10,7 @@ Author: CISA
 File:  bacnet.pcap
 
 Reference:
-[https://github.com/infosecstreams/csaw21/tree/gh-pages/a-pain-in-the-bacnet](https://github.com/infosecstreams/csaw21/tree/gh-pages/a-pain-in-the-bacnet) 
-
-[PDF](APainInTheBACnet.pdf)
+[https://github.com/infosecstreams/csaw21/tree/gh-pages/a-pain-in-the-bacnet](https://github.com/infosecstreams/csaw21/tree/gh-pages/a-pain-in-the-bacnet) [PDF](APainInTheBACnet.pdf)
 
 ### present-value
 
